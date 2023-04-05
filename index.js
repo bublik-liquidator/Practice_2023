@@ -17,6 +17,7 @@ app.get("/", (request, response) => {
 });
 
 app.get("/meetup", db.getMeetup);
+app.get("/meetup/:id", db.getMeetupById);
 
 app.listen(port, () => {
   console.log(`Running on port ${port}.`);
