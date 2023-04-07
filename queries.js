@@ -1,5 +1,6 @@
 const Pool = require("pg").Pool;
-const pool = new Pool({ //пул из 5-и подключений 
+const pool = new Pool({
+  //пул из 5-и подключений
   user: "practice_person",
   host: "localhost",
   database: "practice_meetup",
@@ -27,7 +28,50 @@ const getMeetupById = (request, response) => {
   });
 };
 
+const createMeetup = (request, response) => {
+  const { name, description, tag, venue, time } = request.body; //request.query//body-parser извлекает всю часть тела входящего потока запросов и предоставляет ее req.body
+  pool.query( "INSERT INTO meetup(name, description, tag, venue, time) VALUES ($1, $2, $3, $4, $5)",  [name, description, tag, venue, time],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      console.log(name);
+      response.setHeader("Access-Control-Allow-Origin", "*");
+      response.status(201).send(`meetup added with name: ${name}`); // запрос выполнен успешно и привёл к созданию ресурса
+    }
+  );
+};
+
+const updateMeetup = (request, response) => {
+  const id = parseInt(request.params.id);
+  const { name, description, tag, venue, time } = request.body;
+
+  pool.query(
+    "UPDATE meetup SET name = $1, description = $2, tag = $3, venue = $4, time = $5 WHERE id = $6", [name, description, tag, venue, time, id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.setHeader("Access-Control-Allow-Origin", "*");
+      response.status(200).send(`meetup modified with ID: ${id}`); // запрос выполнен успешно
+    }
+  );
+};
+
+const deleteMeetup = (request, response) => {
+  const id = parseInt(request.params.id);
+  pool.query("DELETE FROM Meetup WHERE id = $1", [id], (error, results) => {
+    if (error) {
+      throw error;
+    }
+    response.status(200).send(`Meetup deleted with ID: ${id}`); // запрос выполнен успешно
+  });
+};
+
 module.exports = {
   getMeetup,
   getMeetupById,
+  createMeetup,
+  updateMeetup,
+  deleteMeetup,
 };
