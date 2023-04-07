@@ -26,6 +26,6 @@
 -node index.js 
 или -nodemon index.js
 
-В данном проете для тестировки запросов был использован Thunder Client https://www.thunderclient.com/, тк его удобно использовать в Visual Studio Code.
+В данном проекте для тестирования запросов был использован Thunder Client https://www.thunderclient.com/, тк его удобно использовать в Visual Studio Code.
 
 
