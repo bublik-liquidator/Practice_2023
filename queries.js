@@ -1,3 +1,5 @@
+const { meetupValidation } = require("./validation/meetup");
+
 const Pool = require("pg").Pool;
 const pool = new Pool({
   //пул из 5-и подключений
@@ -7,6 +9,8 @@ const pool = new Pool({
   password: "meetUP",
   port: 5432,
 });
+
+
 const getMeetup = (request, response) => {
   pool.query("SELECT * FROM meetup ORDER BY id ASC", (error, results) => {
     if (error) {
@@ -29,20 +33,30 @@ const getMeetupById = (request, response) => {
 };
 
 const createMeetup = (request, response) => {
+  const {error}= meetupValidation(request.body); 
+  if (error) {
+    res.send(schema.validate(req.body).error.details);
+    return next({type: 'joi' ,error});
+  }
   const { name, description, tag, venue, time } = request.body; //request.query//body-parser извлекает всю часть тела входящего потока запросов и предоставляет ее req.body
   pool.query( "INSERT INTO meetup(name, description, tag, venue, time) VALUES ($1, $2, $3, $4, $5)",  [name, description, tag, venue, time],
     (error, results) => {
       if (error) {
         throw error;
+
       }
-      console.log(name);
       response.setHeader("Access-Control-Allow-Origin", "*");
-      response.status(201).send(`meetup added with name: ${name}`); // запрос выполнен успешно и привёл к созданию ресурса
+      response.status(201).send(`meetup added with name: ${request.body.name}`); // запрос выполнен успешно и привёл к созданию ресурса
     }
   );
 };
 
 const updateMeetup = (request, response) => {
+  const {error}= meetupValidation(request.body); 
+    if (error) {
+      console.log(error.details[0].message);
+      return res.status(400).json({message:error.details[0].message});
+    }
   const id = parseInt(request.params.id);
   const { name, description, tag, venue, time } = request.body;
 
@@ -64,6 +78,7 @@ const deleteMeetup = (request, response) => {
     if (error) {
       throw error;
     }
+    response.setHeader("Access-Control-Allow-Origin", "*");
     response.status(200).send(`Meetup deleted with ID: ${id}`); // запрос выполнен успешно
   });
 };
