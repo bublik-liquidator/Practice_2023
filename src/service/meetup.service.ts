@@ -6,8 +6,8 @@ async function getAll(page: number, limit: number) {
   return await meetupRepository.getAll(page, limit);
 }
 
-async function getById(meetupId: string) {
-  return await meetupRepository.getById(parseInt(meetupId, 10));
+async function getById(meetupId: number) {
+  return await meetupRepository.getById(meetupId);
 }
 
 async function post(request: MeetupRequest) {
@@ -21,15 +21,12 @@ async function post(request: MeetupRequest) {
   return await meetupRepository.post(a);
 }
 
-async function put(newmeetup: any, id: any) {
-  //newmeetup заменить тип
-
+async function put(newmeetup: Meetup, id: number) {
   return await meetupRepository.put(newmeetup, id);
 }
 
-
-function deleteById(meetupId: any) {
-  return meetupRepository.deleteById(parseInt(meetupId, 10));
+function deleteById(meetupId: number) {
+  return meetupRepository.deleteById(meetupId);
 }
 
 export default {

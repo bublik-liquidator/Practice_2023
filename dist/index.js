@@ -43,8 +43,8 @@ const port = process.env.INDEX_APP_PORT || 3000;
 app.use((0, morgan_1.default)("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/", index_controler_1.default);
-app.use("/meetup", meetups_controller_1.default);
+app.use("/api", index_controler_1.default);
+app.use("/api/meetup", meetups_controller_1.default);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     next((0, http_errors_1.default)(404));

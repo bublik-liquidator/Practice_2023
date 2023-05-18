@@ -33,40 +33,51 @@ const db_Provider_1 = __importDefault(require("../config/db.Provider"));
 loggerr.info(process.env.POSTGRESQL_PORT);
 function getAll(page, size) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { rows } = yield db_Provider_1.default.pool.query("SELECT * FROM meetup ORDER BY id OFFSET $1 LIMIT $2", [(page - 1) * size, size]);
-        return rows;
+        try {
+            const result = yield db_Provider_1.default.pool.query("SELECT * FROM meetup ORDER BY id OFFSET $1 LIMIT $2", [(page - 1) * size, size]);
+            if (result.rows.length > 0) {
+                loggerr.info("Meetups exist.");
+                return result.rows;
+            }
+            else {
+                return 0;
+            }
+        }
+        catch (err) {
+            loggerr.error(err);
+            throw new Error("Repository getAll error");
+        }
     });
 }
 function getById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        {
-            const query = {
-                text: "SELECT * FROM meetup WHERE id = $1",
-                values: [id],
-            };
-            try {
-                const res = yield db_Provider_1.default.pool.query(query);
-                return res.rows[0];
+        try {
+            const result = yield db_Provider_1.default.pool.query(`SELECT * FROM meetup WHERE id = ${id}`);
+            if (result.rows.length > 0) {
+                return result.rows[0];
             }
-            catch (err) {
-                loggerr.info(err);
+            else {
+                return 0;
             }
+        }
+        catch (err) {
+            loggerr.error(err);
+            throw new Error("Repository getById error");
         }
     });
 }
 function post(meetup) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = {
-            text: "INSERT INTO meetup(name, description, tags, place, time) VALUES($1, $2, $3, $4, $5)",
-            values: [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time],
-        };
+        const query = "INSERT INTO meetup(name, description, tags, place, time) VALUES($1, $2, $3, $4, $5)  RETURNING *";
+        const values = [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time];
         try {
-            yield db_Provider_1.default.pool.query(query);
+            const res = yield db_Provider_1.default.pool.query(query, values);
             loggerr.info("Data has been saved!");
-            return meetup;
+            return res.rows[0];
         }
         catch (error) {
             loggerr.error(error);
+            throw new Error("Repository post error");
         }
     });
 }
@@ -77,33 +88,23 @@ function put(meetup, id) {
         const values = [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time, id];
         try {
             const res = yield db_Provider_1.default.pool.query(query, values);
-            loggerr.info("Meetup ${id} updated successfully.");
+            loggerr.info("Meetup with ID:" + id + " updated successfully.");
             return res.rows[0];
         }
         catch (error) {
             loggerr.error(error);
+            throw new Error("Repository put error");
         }
     });
 }
 function deleteById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = {
-            text: "DELETE FROM meetup WHERE id = $1 RETURNING *",
-            values: [id],
-        };
         try {
-            const res = yield db_Provider_1.default.pool.query(query);
-            if (res.rowCount === 0) {
-                return { message: "Data not found" };
-            }
-            else {
-                return res.rows[0];
-                ;
-            }
+            yield db_Provider_1.default.pool.query(`DELETE FROM meetup WHERE id = ${id}`);
         }
-        catch (error) {
-            console.log(error);
-            loggerr.info(error);
+        catch (err) {
+            loggerr.error(err);
+            throw new Error("Repository deleteById error");
         }
     });
 }

@@ -27,6 +27,7 @@
     "joi-to-typescript": "^4.4.1-beta.1",
     "moment": "^2.29.4",
     "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.22",
     "pg": "^8.10.0",
     "pino": "^8.11.0",

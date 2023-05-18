@@ -21,7 +21,7 @@ function getAll(page, limit) {
 }
 function getById(meetupId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield meetups_repository_1.default.getById(parseInt(meetupId, 10));
+        return yield meetups_repository_1.default.getById(meetupId);
     });
 }
 function post(request) {
@@ -38,12 +38,11 @@ function post(request) {
 }
 function put(newmeetup, id) {
     return __awaiter(this, void 0, void 0, function* () {
-        //newmeetup заменить тип
         return yield meetups_repository_1.default.put(newmeetup, id);
     });
 }
 function deleteById(meetupId) {
-    return meetups_repository_1.default.deleteById(parseInt(meetupId, 10));
+    return meetups_repository_1.default.deleteById(meetupId);
 }
 exports.default = {
     getAll,

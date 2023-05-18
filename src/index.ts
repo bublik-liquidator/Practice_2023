@@ -23,8 +23,8 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/", indexControler);
-app.use("/meetup", meetupsController);
+app.use("/api", indexControler);
+app.use("/api/meetup", meetupsController);
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {

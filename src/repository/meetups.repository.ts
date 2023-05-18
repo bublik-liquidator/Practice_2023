@@ -25,75 +25,70 @@ import { Meetup } from '../model/meetup.model';
 loggerr.info(process.env.POSTGRESQL_PORT);
 
 async function getAll(page: number, size: number): Promise<any> {
-  const { rows } = await db.pool.query(
-    "SELECT * FROM meetup ORDER BY id OFFSET $1 LIMIT $2",
-    [(page - 1) * size, size]
-  );
-  return rows;
+  try {
+    const result = await db.pool.query("SELECT * FROM meetup ORDER BY id OFFSET $1 LIMIT $2", [(page - 1) * size, size]);
+    if (result.rows.length > 0) {
+      loggerr.info("Meetups exist.");
+      return result.rows;
+    }
+    else {
+      return 0
+    }
+  }
+  catch (err) {
+    loggerr.error(err);
+    throw new Error("Repository getAll error");
+  }
 }
 
-async function getById(id: any) {
-  {
-    const query = {
-      text: "SELECT * FROM meetup WHERE id = $1",
-      values: [id],
-    }
 
-    try {
-      const res = await db.pool.query(query)
-      return res.rows[0]
-    } catch (err) {
-      loggerr.info(err);
+async function getById(id: number) {
+  try {
+    const result = await db.pool.query(`SELECT * FROM meetup WHERE id = ${id}`);
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    } else {
+      return 0
     }
+  } catch (err) {
+    loggerr.error(err);
+    throw new Error("Repository getById error");
   }
 }
 async function post(meetup: Meetup) {
-  const query = {
-    text: "INSERT INTO meetup(name, description, tags, place, time) VALUES($1, $2, $3, $4, $5)",
-    values: [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time],
-  };
-
+  const query = "INSERT INTO meetup(name, description, tags, place, time) VALUES($1, $2, $3, $4, $5)  RETURNING *";
+  const values = [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time];
   try {
-    await db.pool.query(query)
+    const res = await db.pool.query(query, values);
     loggerr.info("Data has been saved!");
-    return meetup
-
+    return res.rows[0];
   } catch (error) {
     loggerr.error(error);
+    throw new Error("Repository post error");
   }
 };
 
-async function put(meetup: any, id: any) {
 
+async function put(meetup: Meetup, id: number) {
   const query = "UPDATE meetup SET name = $1, description = $2, tags = $3, place = $4, time = $5 WHERE id = $6 RETURNING *";
   const values = [meetup.name, meetup.description, meetup.tags, meetup.place, meetup.time, id];
   try {
     const res = await db.pool.query(query, values);
-    loggerr.info("Meetup ${id} updated successfully.");
+    loggerr.info("Meetup with ID:" + id + " updated successfully.");
     return res.rows[0];
   } catch (error) {
     loggerr.error(error);
+    throw new Error("Repository put error");
+
   }
 }
 
-async function deleteById(id: any) {
-  const query = {
-    text: "DELETE FROM meetup WHERE id = $1 RETURNING *",
-    values: [id],
-  };
-
+async function deleteById(id: number) {
   try {
-    const res = await db.pool.query(query);
-    if (res.rowCount === 0) {
-      return { message: "Data not found" };
-    }
-    else {
-      return res.rows[0];;
-    }
-
-  } catch (error) {
-    console.log(error)
-    loggerr.info(error);
+    await db.pool.query(`DELETE FROM meetup WHERE id = ${id}`);
+  } catch (err) {
+    loggerr.error(err);
+    throw new Error("Repository deleteById error");
   }
 }
 
