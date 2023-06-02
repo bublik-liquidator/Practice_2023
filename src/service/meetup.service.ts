@@ -11,14 +11,14 @@ async function getById(meetupId: number) {
 }
 
 async function post(request: MeetupRequest) {
-  const a = new Meetup();
-  a.name = request.name;
-  a.description = request.description;
-  a.tags = request.tags;
-  a.place = request.place;
-  a.time = request.time;
+  const MeetupReq = new Meetup();
+  MeetupReq.name = request.name;
+  MeetupReq.description = request.description;
+  MeetupReq.tags = request.tags;
+  MeetupReq.place = request.place;
+  MeetupReq.time = request.time;
   //new Meetup(null,request.name,request.description,request.tags,request.place,request.time)
-  return await meetupRepository.post(a);
+  return await meetupRepository.post(MeetupReq);
 }
 
 async function put(newmeetup: Meetup, id: number) {

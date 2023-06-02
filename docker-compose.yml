@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: practice_person
+      POSTGRES_PASSWORD: meetUP
+      POSTGRES_DB: practice_meetup
+    ports:
+      - "5432:5432"
+  app:
+    build: .
+    command: npm run dev
+    volumes:
+       ./data:/var/lib/postgresql/data
+      - /node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

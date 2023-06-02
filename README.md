@@ -4,11 +4,11 @@
 Разработать CRUD REST Web API для работы с митапами.
 
 ## Используемые технологии:
--Node.js;
--Express;
--PostgreSQL 14
--Typescript
--Pino
+- Node.js
+- Express
+- PostgreSQL 14
+- Typescript
+- Pino
 
 ## Функционал Web API:
 1. Получение списка всех митапов;
