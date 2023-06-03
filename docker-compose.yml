@@ -1,21 +1,30 @@
-version: '3'
+version: '3.8'  # Версия Docker Compose
+
 services:
-  db:
-    image: postgres:14
-    restart: always
-    environment:
-      POSTGRES_USER: practice_person
-      POSTGRES_PASSWORD: meetUP
-      POSTGRES_DB: practice_meetup
+  db:  # Сервис базы данных PostgreSQL
+    # ports: # раскоментировать для локального доступа к контейнеру с бд
+    # - "5433:5432"  # Открываем порт 5433 на хост (пк) и бд 5432 (внутри контейнера)
+
+    image: postgres:14  # Используем официальный образ Docker PostgreSQL версии 14
+    environment:  # Настраиваем переменные окружения для базы данных
+      POSTGRES_USER: practice_person  # Имя пользователя для подключения к базе данных
+      POSTGRES_PASSWORD: meetUP  # Пароль для подключения к базе данных
+      POSTGRES_DB: practice_meetup  # Имя базы данных PostgreSQL
+    volumes:  # Монтируем том для хранения данных PostgreSQL
+      - ./data:/var/lib/postgresql/data
+      - ./sql_init_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+  app:  # Сервис Node.js, TypeScript и Express
+    build: .  # Собираем образ из текущего каталога (который содержит Dockerfile)
     ports:
-      - "5432:5432"
-  app:
-    build: .
-    command: npm run dev
-    volumes:
-       ./data:/var/lib/postgresql/data
-      - /node_modules
-    ports:
-      - "3000:3000"
+      - "3000:3000"  # Открываем порт 3000 на хосте
     depends_on:
-      - db
+      - db  # Зависимость от сервиса базы данных PostgreSQL
+    environment:
+       # Настраиваем переменную окружения для подключения к базе данных PostgreSQL
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_HOST: db
+      POSTGRESQL_USER: practice_person
+      POSTGRESQL_PASSWORD: meetUP
+      POSTGRESQL_DB_NAME: practice_meetup
